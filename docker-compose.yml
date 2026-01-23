@@ -41,7 +41,7 @@ services:
     volumes:
       - mariadb_data:/var/lib/mysql
 
-  # 4. Node.js 크롤러 (추가 권장)
+  # 4. Node.js 크롤러 
   # 라라벨과 동일한 DB를 참조하여 트렌드를 수집합니다.
   crawler:
     build:
