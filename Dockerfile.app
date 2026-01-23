@@ -13,7 +13,7 @@ RUN apk update && apk add --no-cache \
     libpng-dev \
     libjpeg-turbo-dev \
     icu-dev \
-    # 다른 필요한 시스템 라이브러리를 여기에 추가할 수 있습니다.
+    # 다른 필요한 시스템 라이브러리를 여기에 추가
     && docker-php-ext-install pdo pdo_mysql zip intl \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install -j$(nproc) gd
@@ -21,7 +21,7 @@ RUN apk update && apk add --no-cache \
 # Composer 설치 (Laravel 의존성 관리 도구)
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# 권한 설정: Laravel은 www-data 사용자로 실행되는 것이 일반적입니다.
+# 권한 설정: Laravel은 www-data 사용자로 실행되는 것이 일반적
 RUN addgroup -g 1000 laravel && adduser -u 1000 -G laravel -s /bin/sh -D laravel
 RUN chown -R laravel:laravel /var/www
 USER laravel

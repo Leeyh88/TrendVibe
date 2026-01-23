@@ -1,18 +1,17 @@
 services:
-  # 1. Nginx 웹 서버 (Reverse Proxy 역할)
+  # 1. Nginx 웹 서버
   web:
     image: nginx:stable-alpine
     container_name: web-server
     ports:
-      - "80:80"
+      - "${NGINX_PORT}:80"
     volumes:
       - ./src:/var/www/html
       - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
     depends_on:
       - app
-      - frontend
 
-  # 2. PHP-FPM (Laravel 백엔드 실행)
+  # 2. PHP-FPM (Laravel 백엔드)
   app:
     build:
       context: .
@@ -22,37 +21,53 @@ services:
       - ./src:/var/www/html
     environment:
       DB_HOST: mariadb
-      DB_DATABASE: tm_db
-      DB_USERNAME: tm_user
-      DB_PASSWORD: tm_password
+      DB_DATABASE: ${DB_NAME}
+      DB_USERNAME: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+    depends_on:
+      - mariadb
 
-  # 3. MariaDB 데이터베이스 (하나만 남김)
+  # 3. MariaDB (공용 DB)
   mariadb:
     image: mariadb:10.6
-    ports:
-    - "3306:3306" # <-- 이 설정이 반드시 있어야 합니다!
     container_name: mariadb-db
+    ports:
+      - "3306:3306"
     environment:
-      MYSQL_DATABASE: tm_db
-      MYSQL_USER: tm_user
-      MYSQL_PASSWORD: tm_password
-      MYSQL_ROOT_PASSWORD: root_tm_password # 루트 비밀번호는 중요!
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
     volumes:
       - mariadb_data:/var/lib/mysql
 
-  # 4. Node.js (Vue.js 개발 서버)
+  # 4. Node.js 크롤러 (추가 권장)
+  # 라라벨과 동일한 DB를 참조하여 트렌드를 수집합니다.
+  crawler:
+    build:
+      context: ./crawler
+      dockerfile: Dockerfile
+    container_name: trend-crawler
+    volumes:
+      - ./crawler:/app
+    environment:
+      DB_HOST: mariadb
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASS: ${DB_PASSWORD}
+    depends_on:
+      - mariadb
+
+  # 5. Vue.js 프론트엔드
   frontend:
     image: node:22-alpine
     container_name: vue-frontend
     working_dir: /app
-    # 💡 Vue 소스 코드가 'frontend' 폴더에 있다면 주석을 해제해야 합니다.
-    # - ./frontend:/app 
     volumes:
-      - ./frontend:/app:delegated # ⭐ ./src/frontend로 수정 (이전의 주석 해제 및 경로 수정)
-    # command: npm run dev
-    command: tail -f /dev/null
+      - ./src:/app:delegated
+    command: npm run dev
     ports:
-      - "5173:5173"
+      - "${VUE_PORT}:5173"
 
 volumes:
   mariadb_data:
