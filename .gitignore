@@ -1,13 +1,13 @@
 # 1. 의존성 파일 (용량이 크고 각 환경에서 설치해야 함)
-/src/vendor/
-/src/node_modules/
+/backend/vendor/
+/backend/node_modules/
 /crawler/node_modules/
 
 # 2. 민감한 설정 정보 (비밀번호, API 키 등)
 .env
-/src/.env
+/backend/.env
 /crawler/.env
-/src/storage/*.key
+/backend/storage/*.key
 
 # 3. 데이터베이스 및 로컬 데이터
 # docker-compose에서 mariadb_data 또는 mysql_data로 지정한 폴더명 확인

@@ -10,6 +10,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
     "mysql2": "^3.16.1",
     "puppeteer": "^24.36.0"
   }

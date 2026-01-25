@@ -6,7 +6,7 @@ services:
     ports:
       - "${NGINX_PORT}:80"
     volumes:
-      - ./src:/var/www/html
+      - ./backend:/var/www/html
       - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
     depends_on:
       - app
@@ -18,11 +18,11 @@ services:
       dockerfile: Dockerfile.app
     container_name: laravel-app
     volumes:
-      - ./src:/var/www/html
+      - ./backend:/var/www/html
     environment:
       DB_HOST: mariadb
-      DB_DATABASE: ${DB_NAME}
-      DB_USERNAME: ${DB_USER}
+      DB_DATABASE: ${DB_DATABASE}
+      DB_USERNAME: ${DB_USERNAME}
       DB_PASSWORD: ${DB_PASSWORD}
     depends_on:
       - mariadb
@@ -34,15 +34,14 @@ services:
     ports:
       - "3306:3306"
     environment:
-      MYSQL_DATABASE: ${DB_NAME}
-      MYSQL_USER: ${DB_USER}
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_USERNAME}
       MYSQL_PASSWORD: ${DB_PASSWORD}
       MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
     volumes:
       - mariadb_data:/var/lib/mysql
 
   # 4. Node.js 크롤러 
-  # 라라벨과 동일한 DB를 참조하여 트렌드를 수집합니다.
   crawler:
     build:
       context: ./crawler
@@ -50,24 +49,29 @@ services:
     container_name: trend-crawler
     volumes:
       - ./crawler:/app
+      - /app/node_modules
     environment:
       DB_HOST: mariadb
-      DB_NAME: ${DB_NAME}
-      DB_USER: ${DB_USER}
+      DB_NAME: ${DB_DATABASE}
+      DB_USER: ${DB_USERNAME}
       DB_PASS: ${DB_PASSWORD}
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
     depends_on:
       - mariadb
+    tty: true
 
-  # 5. Vue.js 프론트엔드
-  frontend:
+# 5. Vite (Inertia용 프론트엔드 컴파일러)
+  vite:
     image: node:22-alpine
-    container_name: vue-frontend
+    container_name: trend-vite
     working_dir: /app
     volumes:
-      - ./src:/app:delegated
-    command: npm run dev
+      - ./backend:/app:delegated
+    command: sh -c "npm install --include=optional --legacy-peer-deps && npx vite --host 0.0.0.0"
     ports:
-      - "${VUE_PORT}:5173"
+      - "5173:5173"
+    environment:
+    - VITE_HMR_HOST=localhost
 
 volumes:
   mariadb_data:

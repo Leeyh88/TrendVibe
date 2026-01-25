@@ -1,7 +1,7 @@
 const puppeteer = require('puppeteer');
 const mysql = require('mysql2/promise');
 
-// DB 설정 (Docker 환경변수 참조)
+// DB 설정
 const dbConfig = {
     host: process.env.DB_HOST || 'mariadb',
     user: process.env.DB_USER || 'tm_user',
@@ -10,108 +10,112 @@ const dbConfig = {
 };
 
 /**
- * 1. SoundCloud 크롤링 로직
+ * 스포티파이 크롤링 및 직접 파싱 로직
  */
-async function crawlSoundCloud(page) {
-    console.log('SoundCloud: 데이터 수집 중');
-    await page.goto('https://soundcloud.com/discover', { waitUntil: 'networkidle2', timeout: 60000 });
-    
-    return await page.evaluate(() => {
-        const items = document.querySelectorAll('.v2-dash-track-item'); 
-        return Array.from(items).slice(0, 10).map(el => ({
-            title: el.querySelector('.title')?.innerText?.trim() || 'Unknown Title',
-            artist: el.querySelector('.artist')?.innerText?.trim() || 'Unknown Artist',
-            platform: 'SoundCloud'
-        }));
-    });
+async function crawlSpotify(page, url, category) {
+    console.log(`Spotify (${category}): 데이터 수집 및 파싱 시작...`);
+    try {
+        await page.goto(url, { waitUntil: 'networkidle2', timeout: 60000 });
+
+        // 트랙 리스트 레이아웃이 로드될 때까지 대기
+        await page.waitForSelector('[data-testid="tracklist-row"]', { timeout: 10000 });
+
+        // 브라우저 컨텍스트 내에서 직접 데이터 추출
+        const tracks = await page.evaluate((categoryName) => {
+            const rows = Array.from(document.querySelectorAll('[data-testid="tracklist-row"]'));
+            
+            // 상위 10개만 추출
+            return rows.slice(0, 10).map((row) => {
+                // 1. 순위 추출
+                const rankText = row.querySelector('.V_m9tLr8WFA3JGMYxfIC span')?.innerText || "0";
+                
+                // 2. 제목 및 트랙 ID 추출
+                const titleElement = row.querySelector('a[data-testid="internal-track-link"]');
+                const title = titleElement?.innerText || "Unknown";
+                const trackHref = titleElement?.getAttribute('href') || "";
+                const external_id = trackHref.split('/track/')[1] || null;
+
+                // 3. 아티스트 추출 (여러 명일 경우 쉼표로 연결)
+                const artistLinks = Array.from(row.querySelectorAll('a[href*="/artist/"]'));
+                const artist = artistLinks.map(el => el.innerText.trim()).join(', ') || "Unknown";
+
+                // 4. 앨범 커버 URL 추출
+                const imgElement = row.querySelector('img');
+                const album_cover_url = imgElement?.src || null;
+
+                return {
+                    rank: parseInt(rankText, 10),
+                    title: title.trim(),
+                    artist: artist.trim(),
+                    album_cover_url: album_cover_url,
+                    external_id: external_id,
+                    category: categoryName
+                };
+            });
+        }, category);
+
+        console.log(`${category} 파싱 완료: ${tracks.length}곡 발견`);
+        return tracks;
+    } catch (e) {
+        console.error(`${category} 크롤링 실패:`, e.message);
+        return [];
+    }
 }
 
-/**
- * 2. Spotify 크롤링 로직 (차트 요약 사이트 활용)
- */
-async function crawlSpotify(page) {
-    console.log('Spotify: 데이터 수집');
-    await page.goto('https://kworb.net/spotify/country/kr_daily.html', { waitUntil: 'networkidle2', timeout: 60000 });
-    
-    return await page.evaluate(() => {
-        const rows = document.querySelectorAll('tbody tr');
-        return Array.from(rows).slice(0, 10).map(el => {
-            const text = el.querySelector('.text')?.innerText || '';
-            const parts = text.split(' - ');
-            return {
-                title: parts[1]?.trim() || 'Unknown Title',
-                artist: parts[0]?.trim() || 'Unknown Artist',
-                platform: 'Spotify'
-            };
-        });
-    });
-}
-
-/**
- * 3. 메인 실행 함수 (라라벨 스케줄러에 의해 호출됨)
- */
 async function run() {
     let browser;
     let connection;
 
     try {
-        console.log('크롤링 프로세스 시작');
-        
         browser = await puppeteer.launch({
-            args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
+            args: ['--no-sandbox', '--disable-setuid-sandbox'],
             executablePath: process.env.PUPPETEER_EXECUTABLE_PATH
         });
-
         const page = await browser.newPage();
+        
+        // 브라우저 에이전트 설정 (차단 방지)
+        await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36');
+
         connection = await mysql.createConnection(dbConfig);
 
-        // 메서드 개별 실행
-        const scResults = await crawlSoundCloud(page);
-        const spResults = await crawlSpotify(page);
-        const combinedResults = [...scResults, ...spResults];
+        // 1. 데이터 수집 (글로벌/코리아)
+        const globalData = await crawlSpotify(page, 'https://open.spotify.com/playlist/37i9dQZEVXbMDoHDwVN2tF', 'Global');
+        const koreaData = await crawlSpotify(page, 'https://open.spotify.com/playlist/37i9dQZEVXbJZGli0rRP3r', 'Korea');
 
-        console.log(`📊 총 ${combinedResults.length}개의 트랙을 DB에 저장합니다.`);
+        const allTracks = [...globalData, ...koreaData];
 
-        for (const track of combinedResults) {
-            // Trend 모델의 fillable 항목들과 매칭
+        // 2. DB 저장 (UPSERT 로직)
+        for (const track of allTracks) {
             const sql = `
-                INSERT INTO trends (
-                    platform, 
-                    title, 
-                    artist, 
-                    \`rank\`, 
-                    category, 
-                    created_at, 
-                    updated_at
-                ) 
-                VALUES (?, ?, ?, ?, ?, NOW(), NOW())
-                ON DUPLICATE KEY UPDATE 
+                INSERT INTO trends (platform, category, \`rank\`, title, artist, album_cover_url, external_id, created_at, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), NOW())
+                ON DUPLICATE KEY UPDATE
                     title = VALUES(title),
                     artist = VALUES(artist),
-                    \`rank\` = VALUES(\`rank\`),
+                    album_cover_url = VALUES(album_cover_url),
+                    external_id = VALUES(external_id),
                     updated_at = NOW()
             `;
-
+            
             await connection.execute(sql, [
-                track.platform, // 'SoundCloud' 또는 'Spotify'
+                'Spotify', 
+                track.category, 
+                track.rank, 
                 track.title, 
                 track.artist, 
-                track.rank,     // 순위 정보 추가
-                'Top 10',       // 카테고리 예시
+                track.album_cover_url, 
+                track.external_id
             ]);
         }
-
-        console.log('모든 데이터 동기화 완료!');
-        process.exit(0); // 성공 종료
+        console.log(`총 ${allTracks.length}개의 데이터를 DB에 성공적으로 업데이트했습니다!`);
 
     } catch (error) {
-        console.error('크롤링 실패:', error.message);
-        process.exit(1); // 에러 종료
+        console.error('실행 중 에러:', error.message);
     } finally {
         if (browser) await browser.close();
         if (connection) await connection.end();
+        process.exit(0);
     }
 }
 
-// 즉시 실행
 run();
