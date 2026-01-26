@@ -5,10 +5,29 @@ import Dropdown from '@/Components/Dropdown.vue';
 import DropdownLink from '@/Components/DropdownLink.vue';
 import NavLink from '@/Components/NavLink.vue';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink.vue';
-import { Link } from '@inertiajs/vue3';
+import { Link, useForm } from '@inertiajs/vue3';
 
 const showingNavigationDropdown = ref(false);
+
+// --- 관리자 문의 모달 상태 및 폼 설정 ---
+const isContactModalOpen = ref(false);
+const contactForm = useForm({
+    email: '',
+    message: '',
+});
+
+const submitContact = () => {
+    contactForm.post(route('contact.store'), {
+        preserveScroll: true,
+        onSuccess: () => {
+            isContactModalOpen.value = false;
+            contactForm.reset();
+            alert('관리자에게 소중한 의견이 전달되었습니다!');
+        },
+    });
+};
 </script>
+
 <template>
     <div>
         <div class="min-h-screen bg-gray-100">
@@ -75,42 +94,19 @@ const showingNavigationDropdown = ref(false);
                             </div>
                         </div>
 
-                        <!-- Hamburger -->
                         <div class="-me-2 flex items-center min-[835px]:hidden">
                             <button
-                                @click="
-                                    showingNavigationDropdown =
-                                        !showingNavigationDropdown
-                                "
+                                @click="showingNavigationDropdown = !showingNavigationDropdown"
                                 class="inline-flex items-center justify-center rounded-md p-2 text-gray-400 transition duration-150 ease-in-out hover:bg-gray-100 hover:text-gray-500 focus:bg-gray-100 focus:text-gray-500 focus:outline-none"
                             >
-                                <svg
-                                    class="h-6 w-6"
-                                    stroke="currentColor"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                >
+                                <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
                                     <path
-                                        :class="{
-                                            hidden: showingNavigationDropdown,
-                                            'inline-flex':
-                                                !showingNavigationDropdown,
-                                        }"
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="2"
-                                        d="M4 6h16M4 12h16M4 18h16"
+                                        :class="{ hidden: showingNavigationDropdown, 'inline-flex': !showingNavigationDropdown }"
+                                        stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"
                                     />
                                     <path
-                                        :class="{
-                                            hidden: !showingNavigationDropdown,
-                                            'inline-flex':
-                                                showingNavigationDropdown,
-                                        }"
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="2"
-                                        d="M6 18L18 6M6 6l12 12"
+                                        :class="{ hidden: !showingNavigationDropdown, 'inline-flex': showingNavigationDropdown }"
+                                        stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"
                                     />
                                 </svg>
                             </button>
@@ -118,57 +114,28 @@ const showingNavigationDropdown = ref(false);
                     </div>
                 </div>
 
-                <!-- Responsive Navigation Menu -->
-                <div
-                    :class="{
-                        block: showingNavigationDropdown,
-                        hidden: !showingNavigationDropdown,
-                    }"
-                    class="min-[835px]:hidden"
-                >
+                <div :class="{ block: showingNavigationDropdown, hidden: !showingNavigationDropdown }" class="min-[835px]:hidden">
                     <div class="space-y-1 pb-3 pt-2">
-                        <ResponsiveNavLink :href="route('home')" :active="route().current('home')">
-                            홈
-                        </ResponsiveNavLink>
-                        <ResponsiveNavLink :href="route('rankings')" :active="route().current('rankings')">
-                            순위
-                        </ResponsiveNavLink>
-                        <ResponsiveNavLink :href="route('mixmatch')" :active="route().current('mixmatch')">
-                            믹스매치
-                        </ResponsiveNavLink>
-                        <ResponsiveNavLink :href="route('posts.index')" :active="route().current('posts')">
-                            커뮤니티
-                        </ResponsiveNavLink>
-                        <ResponsiveNavLink :href="route('trends')" :active="route().current('trends')">
-                            핫트렌드
-                        </ResponsiveNavLink>
-                        <ResponsiveNavLink :href="route('remixes.index')" :active="route().current('remixes.index')">
-                            리믹스
-                        </ResponsiveNavLink>
-                        <ResponsiveNavLink :href="route('favorites.index')" :active="route().current('favorites.index')">
-                            MY VIBE
-                        </ResponsiveNavLink>
-
+                        <ResponsiveNavLink :href="route('home')" :active="route().current('home')">홈</ResponsiveNavLink>
+                        <ResponsiveNavLink :href="route('rankings')" :active="route().current('rankings')">순위</ResponsiveNavLink>
+                        <ResponsiveNavLink :href="route('mixmatch')" :active="route().current('mixmatch')">믹스매치</ResponsiveNavLink>
+                        <ResponsiveNavLink :href="route('posts.index')" :active="route().current('posts.*')">커뮤니티</ResponsiveNavLink>
+                        <ResponsiveNavLink :href="route('trends')" :active="route().current('trends')">핫트렌드</ResponsiveNavLink>
+                        <ResponsiveNavLink :href="route('remixes.index')" :active="route().current('remixes.index')">리믹스</ResponsiveNavLink>
+                        <ResponsiveNavLink :href="route('favorites.index')" :active="route().current('favorites.index')">MY VIBE</ResponsiveNavLink>
                     </div>
 
-                    <!-- Responsive Settings Options -->
                     <div class="border-t border-gray-200 pb-1 pt-4">
                         <template v-if="$page.props.auth.user">
                             <div class="px-4">
-                                <div class="text-base font-medium text-gray-800">
-                                    {{ $page.props.auth.user.name }}
-                                </div>
-                                <div class="text-sm font-medium text-gray-500">
-                                    {{ $page.props.auth.user.email }}
-                                </div>
+                                <div class="text-base font-medium text-gray-800">{{ $page.props.auth.user.name }}</div>
+                                <div class="text-sm font-medium text-gray-500">{{ $page.props.auth.user.email }}</div>
                             </div>
-
                             <div class="mt-3 space-y-1">
                                 <ResponsiveNavLink :href="route('profile.edit')"> Profile </ResponsiveNavLink>
                                 <ResponsiveNavLink :href="route('logout')" method="post" as="button"> Log Out </ResponsiveNavLink>
                             </div>
                         </template>
-
                         <template v-else>
                             <div class="space-y-1">
                                 <ResponsiveNavLink :href="route('login')"> 로그인 </ResponsiveNavLink>
@@ -179,20 +146,74 @@ const showingNavigationDropdown = ref(false);
                 </div>
             </nav>
 
-            <!-- Page Heading -->
-            <header
-                class="bg-white shadow"
-                v-if="$slots.header"
-            >
+            <header class="bg-white shadow" v-if="$slots.header">
                 <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
                     <slot name="header" />
                 </div>
             </header>
 
-            <!-- Page Content -->
             <main>
                 <slot />
             </main>
+
+            <button 
+                @click="isContactModalOpen = true"
+                class="fixed bottom-8 right-8 w-14 h-14 bg-indigo-600 text-white rounded-full shadow-2xl hover:bg-indigo-700 transition-all flex items-center justify-center z-[60] hover:scale-110 active:scale-95 group"
+            >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 group-hover:rotate-12 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+            </button>
+
+            <div v-if="isContactModalOpen" 
+                 class="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+                 @click.self="isContactModalOpen = false"
+            >
+                <div class="bg-white rounded-3xl p-8 w-full max-w-md shadow-2xl transform transition-all border border-gray-100">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-2xl font-black text-gray-900 tracking-tighter">
+                            trend<span class="text-indigo-600">Vibe</span> 피드백
+                        </h3>
+                        <button @click="isContactModalOpen = false" class="text-gray-400 hover:text-gray-600 transition-colors">
+                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                    
+                    <form @submit.prevent="submitContact" class="space-y-5">
+                        <div>
+                            <label class="block text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 mb-1.5 ml-1">회신받을 이메일</label>
+                            <input 
+                                v-model="contactForm.email"
+                                type="email" 
+                                required
+                                class="w-full border-gray-100 bg-gray-50 rounded-2xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all py-3 px-4 text-sm"
+                                placeholder="name@example.com"
+                            />
+                        </div>
+
+                        <div>
+                            <label class="block text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 mb-1.5 ml-1">문의 및 제안</label>
+                            <textarea 
+                                v-model="contactForm.message"
+                                required
+                                rows="4"
+                                class="w-full border-gray-100 bg-gray-50 rounded-2xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all py-3 px-4 text-sm resize-none"
+                                placeholder="TrendVibe를 더 즐겁게 만들 아이디어를 들려주세요!"
+                            ></textarea>
+                        </div>
+
+                        <button 
+                            type="submit"
+                            :disabled="contactForm.processing"
+                            class="w-full py-4 bg-indigo-600 text-white rounded-2xl font-black text-[11px] uppercase tracking-[0.2em] hover:bg-indigo-700 disabled:opacity-50 transition-all shadow-xl shadow-indigo-100 mt-2"
+                        >
+                            {{ contactForm.processing ? '보내는 중...' : '메시지 전송하기' }}
+                        </button>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 </template>

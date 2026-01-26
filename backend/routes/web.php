@@ -16,6 +16,7 @@ use App\Models\MatchLog;
 use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\SocialController;
 use App\Http\Controllers\FavoriteController;
+use App\Http\Controllers\ContactController;
 
 // 구글 OAuth
 Route::get('auth/google', [GoogleController::class, 'redirectToGoogle'])->name('google.login');
@@ -24,6 +25,9 @@ Route::get('auth/google/callback', [GoogleController::class, 'handleGoogleCallba
 // 카카오 OAuth
 Route::get('/auth/kakao', [SocialController::class, 'redirectToKakao']);
 Route::get('/auth/kakao/callback', [SocialController::class, 'handleKakaoCallback']);
+
+// 관리자 문의 저장 라우트
+Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
 
 // 메인 페이지
 Route::get('/', [MainController::class, 'index'])->name('home');
