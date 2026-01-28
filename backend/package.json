@@ -30,6 +30,7 @@
         "vue": "^3.5.26"
     },
     "optionalDependencies": {
+        "@rollup/rollup-darwin-arm64": "^4.57.0",
         "@rollup/rollup-linux-arm64-musl": "^4.56.0"
     }
 }
