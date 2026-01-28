@@ -20,6 +20,7 @@ Thumbs.db
 .vscode/
 .idea/
 *.log
+docker-compose.override.yml
 
 # ssl
 certbot/
