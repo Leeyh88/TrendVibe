@@ -6,7 +6,7 @@ const dbConfig = {
     host: process.env.DB_HOST || 'mariadb',
     user: process.env.DB_USER || 'tm_user',
     password: process.env.DB_PASS || 'tm_password',
-    database: process.env.DB_NAME || 'tm_db',
+    database: process.env.DB_NAME || 'tv_db',
 };
 
 /**

@@ -4,9 +4,9 @@
 /crawler/node_modules/
 
 # 2. 민감한 설정 정보 (비밀번호, API 키 등)
-.env
-/backend/.env
-/crawler/.env
+.env*
+/backend/.env*
+/crawler/.env*
 /backend/storage/*.key
 
 # 3. 데이터베이스 및 로컬 데이터
@@ -19,3 +19,7 @@
 Thumbs.db
 .vscode/
 .idea/
+*.log
+
+# ssl
+certbot/
