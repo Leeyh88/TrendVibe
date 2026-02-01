@@ -17,6 +17,7 @@ use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\SocialController;
 use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\MidiAnalysisController; 
 
 // 구글 OAuth
 Route::get('auth/google', [GoogleController::class, 'redirectToGoogle'])->name('google.login');
@@ -105,6 +106,10 @@ Route::get('/remixes', [RemixController::class, 'index'])->name('remixes.index')
 
 // 로그인한 사용자만 접근 가능한 메뉴들
 Route::middleware(['auth'])->group(function () {
+
+    Route::get('/midi-analysis', [MidiAnalysisController::class, 'index']);
+    Route::post('/api/midi-analyze', [MidiAnalysisController::class, 'analyze']);
+
     // 관심곡 (핫트렌드, 리믹스)
     Route::post('/favorites/toggle', [FavoriteController::class, 'toggle'])->name('favorites.toggle');
 

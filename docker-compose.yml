@@ -20,6 +20,8 @@ services:
       context: .
       dockerfile: Dockerfile.app
     container_name: laravel-app
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     volumes:
       - ./backend:/var/www/html
     environment:
