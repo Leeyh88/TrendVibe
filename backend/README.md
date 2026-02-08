@@ -19,13 +19,20 @@
 ### 2. 적용기술
 <img src="https://img.shields.io/badge/Laravel_11-FF2D20?style=for-the-badge&logo=laravel&logoColor=white"> <img src="https://img.shields.io/badge/Vue.js_3-4FC08D?style=for-the-badge&logo=vue.js&logoColor=white"> <img src="https://img.shields.io/badge/MariaDB-003545?style=for-the-badge&logo=mariadb&logoColor=white"> <img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white"> <img src="https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white"> <img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black">
 
-1️⃣ **Mix Match**: 1:1 매칭 인터페이스를 통한 몰입감 있는 투표 경험 제공  
-<img width="1370" height="1194" alt="스크린샷 2026-01-23 오후 11 25 33" src="https://github.com/user-attachments/assets/0a7c4960-b1ba-4b47-ab4a-f2ac8da75895" />
+1️⃣  **AI MIDI Analysis**: Groq 엔진 및 Redis Queue 기반의 초고속 분석 시스템
+단순한 데이터 나열을 넘어, 세계에서 가장 빠른 AI 추론 엔진인 Groq과 고성능 인메모리 데이터 구조 저장소인 Redis를 결합하여 분석 제공합니다.
+
+- Redis Queue 기반 백그라운드 처리: 사용자가 파일을 업로드하는 즉시 분석 작업이 백그라운드 큐(Queue)로 이관됩니다. 업로드 직후 화면이 멈추지 않으며, 다른 작업을 하는 동안 AI가 조용히 분석을 수행합니다.
+
+- 초광속 Groq API 연동: AWS의 제한된 자원 환경에서도 무거운 로컬 모델 대신 Groq API를 사용함으로써, 수초 내에 딥러닝 기반의 정밀 피드백을 산출하는 비동기 처리 시스템을 구축했습니다.
+
+- 전문 화성학 리포트 및 가이드: 분석이 완료되면 당신의 MIDI 데이터를 바탕으로 코드 진행, 멜로디 라인, 리듬 패턴에 대한 전문적인 화성학 리포트와 구체적인 개선 방향을 제공합니다.
+
+<img width="701" height="1089" alt="스크린샷 2026-02-09 오전 1 47 33" src="https://github.com/user-attachments/assets/5f5cf2f6-aa62-4165-ae23-d768c1fdeab1" />
 
 2️⃣ **Remix**: 전체 리믹스 등록 곡을 최신순/인기순으로 탐색할 수 있는 목록 페이지  
 <img width="1125" height="1194" alt="스크린샷 2026-01-23 오후 11 27 01" src="https://github.com/user-attachments/assets/154f3015-71ba-4f8a-87e0-b371d7b070f8" />
 
-3️⃣ **MyVibe**: 내가 등록한 리믹스의 득표 현황 및 좋아요한 핫트렌드곡, 리믹스곡 리스트 제공  
 3️⃣ **MyVibe**: 내가 등록한 리믹스의 득표 현황 및 좋아요한 핫트렌드곡, 리믹스곡 리스트 제공  
 <img width="1333" height="1197" alt="스크린샷 2026-01-24 오전 2 35 03" src="https://github.com/user-attachments/assets/80dd4b96-8d94-4732-b07c-5c54a5079592" />
 <img width="1344" height="1207" alt="스크린샷 2026-01-24 오전 2 34 53" src="https://github.com/user-attachments/assets/3e62e7ff-fd9c-41d6-81c8-6cdb7220a6a7" />
@@ -36,6 +43,11 @@
 
 5️⃣ **Ranking**: 축적된 투표 데이터를 기반으로 실시간 트렌드를 반영하여 산출된 **플랫폼 통합 인기 랭킹** 시스템
 <img width="1288" height="1204" alt="스크린샷 2026-01-23 오후 11 29 14" src="https://github.com/user-attachments/assets/faec3b58-fc61-4f59-b662-23080452d01f" />
+
+6️⃣ **Mix Match**: 1:1 매칭 인터페이스를 통한 몰입감 있는 투표 경험 제공  
+<img width="1370" height="1194" alt="스크린샷 2026-01-23 오후 11 25 33" src="https://github.com/user-attachments/assets/0a7c4960-b1ba-4b47-ab4a-f2ac8da75895" />
+
+
 
 ---
 
@@ -221,16 +233,18 @@ return Inertia::render('Posts/Index', [
 ## 데이터베이스 운영
 
 ### 1. 관계형 데이터 모델링 (MariaDB)
-* **테이블 정규화**: `Users`, `Remixes`, `MatchLogs` 테이블 간의 효율적인 관계 설정을 통해 데이터 무결성을 확보했습니다.
-* **득표수 집계 최적화**: `MatchLog` 테이블에 투표 데이터를 기록하고, 이를 기반으로 리믹스의 실시간 승률 및 순위를 산출하는 로직을 구축했습니다.
-* **상태 관리 설계**: `is_active` 컬럼을 활용하여 부적절한 게시물이나 비활성 사용자의 데이터를 실시간으로 필터링할 수 있도록 설계했습니다.
+* **비동기 분석 데이터 관리:**: AI 피드백 결과와 MIDI 메타데이터를 통합 관리하는 `Analyses` 테이블을 설계하여, 리믹스 업로드와 분석 결과 사이의 논리적 연결을 강화했습니다.
+* **테이블 정규화**: `Users`, `Remixes`, `MatchLogs`,`Analyses` 테이블 간의 효율적인 관계 설정을 통해 데이터 무결성을 확보했습니다.
+* **대규모 데이터 처리 최적화**: `MatchLog` 테이블을 통한 승률/순위 산출 로직을 고도화하고, `is_active` 컬럼 기반의 필터링을 통해 대규모 트래픽 시에도 데이터 응답 속도를 확보했습니다.
 
 
 ---
 
 ## 도커 운영
 
-* **컨테이너화**: PHP-FPM, Nginx, MariaDB를 개별 컨테이너로 분리하여 독립적이고 일관된 운영 환경을 구축했습니다.
-* **마운트**: 소스 코드와 DB 데이터를 볼륨으로 관리하여 컨테이너 재생성 시에도 데이터가 유지되도록 설계했습니다.
+* **컨테이너화**: PHP-FPM(App), Nginx(Web), MariaDB, Redis, Node.js(Crawler)를 개별 컨테이너로 분리하여 독립적이고 일관된 운영 환경을 구축했습니다.
+* **워크플로우 분리**: 분석 전 전용 일꾼인 queue-worker 컨테이너를 별도로 운용하여, 웹 요청 처리와 무거운 백그라운드 작업이 서로의 성능에 영향을 주지 않도록 설계했습니다.
+* **마운트**: 소스 코드와 DB 데이터(mariadb_data) 및 인메모리 데이터(redis_data)으로 관리하여 컨테이너 재생성 시에도 데이터가 유지되도록 설계했습니다.
+* **컨테이너 간 스토리지 공유 최적화**: Laravel 컨테이너가 생성한 MIDI 파일을 NGinx 컨테이너가 즉시 서빙할 수 있도록 물리적 스토리지 경로(Storage Path)를 다중 마운트하여, 심볼릭 링크 문제를 해결하고 정적 파일 접근성을 확보했습니다.
 
 
