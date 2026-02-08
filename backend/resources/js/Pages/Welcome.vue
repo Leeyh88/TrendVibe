@@ -158,34 +158,48 @@ const toggleFavoriteFromModal = () => {
         <div class="py-10 bg-[#FBFBFE] min-h-screen">
             <div class="max-w-6xl mx-auto px-6">
                 
-                <header class="mb-12 relative overflow-hidden bg-gradient-to-br from-indigo-700 via-indigo-800 to-black p-10 sm:p-16 rounded-[3rem] text-white shadow-2xl">
-                    <div class="relative z-10 max-w-2xl">
-                        <span v-if="!$page.props.auth.user" class="inline-block px-4 py-1.5 bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-[10px] font-black uppercase tracking-[0.2em] mb-6">
-                            Start Your Remix Journey
-                        </span>
-                        <span v-else class="inline-block px-4 py-1.5 bg-indigo-500/30 backdrop-blur-md border border-indigo-400/30 rounded-full text-[10px] font-black uppercase tracking-[0.2em] mb-6">
-                            Welcome Back, {{ $page.props.auth.user.name }}!
-                        </span>
+              <header class="mb-12 relative overflow-hidden bg-gradient-to-br from-indigo-700 via-indigo-800 to-black p-10 sm:p-16 rounded-[3rem] text-white shadow-2xl">
+    <div class="relative z-10 max-w-2xl">
+        <span v-if="!$page.props.auth.user" class="inline-block px-4 py-1.5 bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-[10px] font-black uppercase tracking-[0.2em] mb-6">
+            Start Your Remix Journey
+        </span>
+        <span v-else class="inline-block px-4 py-1.5 bg-indigo-500/30 backdrop-blur-md border border-indigo-400/30 rounded-full text-[10px] font-black uppercase tracking-[0.2em] mb-6">
+            Welcome Back, {{ $page.props.auth.user.name }}!
+        </span>
 
-                        <h1 class="text-4xl sm:text-6xl font-black tracking-tighter leading-[1.1] mb-6">
-                            당신의 음악적 감각을 <br/>
-                            <span class="text-indigo-400 italic">증명</span> 하세요
-                        </h1>
+        <h1 class="text-4xl sm:text-6xl font-black tracking-tighter leading-[1.1] mb-6">
+            당신의 음악적 감각을 <br/>
+            <span class="text-indigo-400 italic">증명</span> 하세요
+        </h1>
 
-                        <div class="flex flex-wrap gap-4 mt-10">
-                            <template v-if="!$page.props.auth.user">
-                                <Link :href="route('register')" class="px-8 py-4 bg-white text-indigo-900 rounded-2xl font-black text-sm hover:bg-indigo-50 transition-all shadow-lg">시작하기</Link>
-                                <Link :href="route('login')" class="px-8 py-4 bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-2xl font-black text-sm hover:bg-white/20 transition-all">로그인</Link>
-                            </template>
-                            <template v-else>
-                                <Link :href="route('remixes.create')" class="px-8 py-4 bg-white text-indigo-900 rounded-2xl font-black text-sm hover:bg-indigo-50 transition-all shadow-lg flex items-center gap-2">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path d="M12 4v16m8-8H4" /></svg>
-                                    리믹스 업로드
-                                </Link>
-                            </template>
-                        </div>
-                    </div>
-                </header>
+        <p class="text-white/60 text-sm sm:text-base font-bold leading-relaxed mb-10 max-w-lg">
+            단순한 업로드를 넘어, <span class="text-white">AI 화성학 엔진</span>을 통해 <br class="hidden sm:block"/>
+            당신의 MIDI 데이터를 정밀 분석하고 전문적인 피드백을 받아보세요.
+        </p>
+
+        <div class="flex flex-wrap gap-4">
+            <template v-if="!$page.props.auth.user">
+                <Link :href="route('register')" class="px-8 py-4 bg-white text-indigo-900 rounded-2xl font-black text-sm hover:bg-indigo-50 transition-all shadow-lg">시작하기</Link>
+                <Link :href="route('login')" class="px-8 py-4 bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-2xl font-black text-sm hover:bg-white/20 transition-all">로그인</Link>
+            </template>
+            <template v-else>
+                <Link :href="route('midi.index')" class="px-8 py-4 bg-indigo-500 text-white rounded-2xl font-black text-sm hover:bg-indigo-400 transition-all shadow-xl shadow-indigo-900/20 flex items-center gap-2 border border-indigo-400/30">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                    AI MIDI 피드백 받기
+                </Link>
+
+                <Link :href="route('remixes.create')" class="px-8 py-4 bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-2xl font-black text-sm hover:bg-white/20 transition-all flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path d="M12 4v16m8-8H4" /></svg>
+                    리믹스 업로드
+                </Link>
+            </template>
+        </div>
+    </div>
+
+    <div class="absolute right-[-10%] top-[-10%] w-[50%] h-[120%] opacity-20 pointer-events-none rotate-12 bg-gradient-to-l from-indigo-500 to-transparent rounded-full blur-3xl"></div>
+</header>
 
                 <section class="mb-16">
                     <div class="flex items-center justify-between mb-8 px-2">

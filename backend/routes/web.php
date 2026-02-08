@@ -107,8 +107,20 @@ Route::get('/remixes', [RemixController::class, 'index'])->name('remixes.index')
 // 로그인한 사용자만 접근 가능한 메뉴들
 Route::middleware(['auth'])->group(function () {
 
-    Route::get('/midi-analysis', [MidiAnalysisController::class, 'index']);
+    // 1. 분석 요청 페이지 (업로드 폼)
+    Route::get('/midi-analyze', [MidiAnalysisController::class, 'index'])->name('midi.index');
+
+    // 2. 내 분석 리스트 페이지 (Inertia 렌더링)
+    Route::get('/midi-analyze/list', [MidiAnalysisController::class, 'list'])->name('midi.list');
+
+    // 3. 분석 상세 페이지 (Inertia 렌더링 - 여기서 Show.vue를 부름)
+    // 경로를 /api/가 아닌 일반 경로로 바꾸는 것을 추천합니다.
+    Route::get('/midi-analyze/{analysis}', [MidiAnalysisController::class, 'show'])->name('midi.show');
+
+    // 4. (참고) 순수 데이터 API가 필요한 경우 (Axios용)
+    Route::get('/api/midi-data/{analysis}', [MidiAnalysisController::class, 'getApiData']);
     Route::post('/api/midi-analyze', [MidiAnalysisController::class, 'analyze']);
+    
 
     // 관심곡 (핫트렌드, 리믹스)
     Route::post('/favorites/toggle', [FavoriteController::class, 'toggle'])->name('favorites.toggle');

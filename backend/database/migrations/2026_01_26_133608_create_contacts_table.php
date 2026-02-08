@@ -11,13 +11,15 @@ return new class extends Migration
      */
     public function up(): void
 {
-    Schema::create('contacts', function (Blueprint $table) {
-        $table->id();
-        $table->string('email'); // 회신받을 이메일
-        $table->text('message'); // 문의 내용
-        $table->boolean('is_read')->default(false); // 읽음 처리 여부 (나중에 어드민용)
-        $table->timestamps(); // 작성일자
-    });
+    if (!Schema::hasTable('contacts')) {
+        Schema::create('contacts', function (Blueprint $table) {
+            $table->id();
+            $table->string('email'); // 회신받을 이메일
+            $table->text('message'); // 문의 내용
+            $table->boolean('is_read')->default(false); // 읽음 처리 여부 (나중에 어드민용)
+            $table->timestamps(); // 작성일자
+        });
+    }
 }
 
     /**
