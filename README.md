@@ -1,5 +1,4 @@
-# Trend Vibe
-##### Live Service: https://trendvibe.kr/
+# Trend Mixer
 #### 바로가기
 * [사이트 소개](#사이트-소개)
 * [Laravel 핵심 기술](#laravel-핵심기술)
@@ -9,60 +8,31 @@
 
 - - -
 ## 사이트 소개
-### trendVibe : 현대적 리믹스 투표 & 트렌드 분석 플랫폼
+> **Laravel 11 & Vue.js (Inertia.js)** 기반의 현대적 아키텍처로 구축된 리믹스 투표 플랫폼입니다. 
+> 단순한 기능을 넘어 **시스템 보안, 리소스 최적화, 데이터 자동화 파이프라인** 구축에 집중했습니다.
 
-> **Laravel 11 & Vue.js (Inertia.js)** 기반의 현대적 아키텍처로 구축된 참여형 리믹스 아카이브 플랫폼입니다. 
-> 단순한 기능을 넘어 **시스템 보안, 리소스 최적화, 데이터 자동화 파이프라인** 구축에 집중하여 실무 수준의 완성도를 확보했습니다.
+### 1. 서비스 내용
+**TrendMixer**는 사용자가 직접 리믹스 음원을 발굴하고 평가하며 공유하는 참여형 플랫폼입니다. YouTube API를 통해 누구나 자신만의 리믹스 아카이브를 구축할 수 있으며, 이렇게 등록된 곡들은 1:1 믹스매치 시스템을 통해 사용자들의 실시간 투표로 경쟁하게 됩니다.
 
----
+단순한 투표에 그치지 않고, 축적된 투표 로그를 정교하게 분석하여 실시간 인기 랭킹을 산출함으로써 공신력 있는 차트를 제공합니다. 또한, Node.js(Puppeteer) 기반의 크롤러를 통해 Spotify, SoundCloud 등 주요 플랫폼의 최신 핫트렌드 데이터를 자동으로 수집하여 사용자에게 통합된 음악 인사이트를 제시합니다. 모든 과정은 Inertia.js 기반의 SPA 환경에서 새로고침 없이 부드럽게 이루어지며, Tiptap 에디터가 통합된 커뮤니티를 통해 깊이 있는 음악적 소통을 지원합니다.
 
-### 서비스 컨셉
-**TrendMixer**는 사용자가 직접 리믹스 음원을 발굴하고 평가하며 공유하는 플랫폼의 핵심 엔진입니다.
-* **Interactive Archiving**: YouTube API를 연동하여 누구나 자신만의 리믹스 아카이브를 구축할 수 있습니다.
-* **1:1 MixMatch System**: 등록된 곡들은 1:1 토너먼트 방식의 믹스매치 시스템을 통해 실시간 사용자 투표로 경쟁합니다.
-* **Data-Driven Rankings**: 축적된 투표 로그를 정교하게 분석하여 실시간 인기 랭킹과 공신력 있는 차트를 산출합니다.
-* **Seamless UX**: Inertia.js 기반의 SPA 환경을 구축하여 전 페이지 새로고침 없는 부드러운 사용자 경험을 제공하며, Tiptap 에디터가 통합된 커뮤니티에서 깊이 있는 소통이 가능합니다.
+### 2. 적용기술
+<img src="https://img.shields.io/badge/Laravel_11-FF2D20?style=for-the-badge&logo=laravel&logoColor=white"> <img src="https://img.shields.io/badge/Vue.js_3-4FC08D?style=for-the-badge&logo=vue.js&logoColor=white"> <img src="https://img.shields.io/badge/MariaDB-003545?style=for-the-badge&logo=mariadb&logoColor=white"> <img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white"> <img src="https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white"> <img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black">
 
----
+1️⃣  **AI MIDI Analysis**: Groq 엔진 및 Redis Queue 기반의 초고속 분석 시스템
+단순한 데이터 나열을 넘어, 세계에서 가장 빠른 AI 추론 엔진인 Groq과 고성능 인메모리 데이터 구조 저장소인 Redis를 결합하여 분석 제공합니다.
 
-### 핵심 기술 성취
+- Redis Queue 기반 백그라운드 처리: 사용자가 파일을 업로드하는 즉시 분석 작업이 백그라운드 큐(Queue)로 이관됩니다. 업로드 직후 화면이 멈추지 않으며, 다른 작업을 하는 동안 AI가 조용히 분석을 수행합니다.
 
-#### 1. 하이브리드 데이터 자동화
-단일 API의 한계를 극복하기 위해 플랫폼별 특성에 맞춘 최적화된 수집 방식을 설계했습니다.
-* **YouTube Data Automation**: Laravel Custom Command를 구축하고 스케줄러를 통해 실시간 트렌드 정보를 주기적으로 자동 수집합니다.
-* **Multi-Platform Scraping**: **Node.js (Puppeteer)** 기반의 크롤러를 통해 주기적으로 Spotify, SoundCloud 등 주요 플랫폼의 최신 핫트렌드 데이터를 자동으로 수집하여 사용자에게 통합된 음악 인사이트를 제공합니다.
+- 초광속 Groq API 연동: AWS의 제한된 자원 환경에서도 무거운 로컬 모델 대신 Groq API를 사용함으로써, 수초 내에 딥러닝 기반의 정밀 피드백을 산출하는 비동기 처리 시스템을 구축했습니다.
 
+- 전문 화성학 리포트 및 가이드: 분석이 완료되면 당신의 MIDI 데이터를 바탕으로 코드 진행, 멜로디 라인, 리듬 패턴에 대한 전문적인 화성학 리포트와 구체적인 개선 방향을 제공합니다.
 
-
-#### 2. 리소스 최적화 및 API 전략
-서버 리소스 보존과 빠른 반응 속도를 위해 전략적으로 로직을 분산 배치했습니다.
-* **Front-end API Direct Integration**: 호출 제한이 없는 **iTunes API**를 활용한 곡 검색 기능을 프론트엔드에서 직접 처리하도록 설계했습니다.
-* **Efficiency**: 이를 통해 서버의 불필요한 프록시 부하를 제거하고, 클라이언트 사이드에서 즉각적인 인터랙션을 제공하는 최적화 전략을 취했습니다.
-
-#### 3. 확장 가능한 인프라 및 관리 시스템
-* **Security & Proxy**: **Cloudflare** 프록시 계층을 배치하여 실제 서버 IP 보호 및 전 구간 HTTPS 보안을 강화했습니다.
-* **Admin Ecosystem**: **Filament** 어드민 패널을 확장하여 유저 피드백(Contact) 및 사이트 리소스를 효율적으로 제어하는 통합 대시보드를 구축했습니다.
-* **Infrastructure**: **AWS Lightsail**을 활용한 안정적인 호스팅 환경을 구성했습니다.
-
----
-
-### 기술 스택
-* **Framework**: Laravel 11, Vue.js 3 (Inertia.js)
-* **Real-time Data**: Node.js (Puppeteer)
-* **Styling**: Tailwind CSS
-* **DevOps**: Docker
-* **Admin**: Filament PHP
-* **Infrastructure**: AWS Lightsail, Cloudflare
-* **Database**: MySQL
-* **Editor**: Tiptap Editor
-
-1️⃣ **Mix Match**: 1:1 매칭 인터페이스를 통한 몰입감 있는 투표 경험 제공  
-<img width="1370" height="1194" alt="스크린샷 2026-01-23 오후 11 25 33" src="https://github.com/user-attachments/assets/0a7c4960-b1ba-4b47-ab4a-f2ac8da75895" />
+<img width="701" height="1089" alt="스크린샷 2026-02-09 오전 1 47 33" src="https://github.com/user-attachments/assets/5f5cf2f6-aa62-4165-ae23-d768c1fdeab1" />
 
 2️⃣ **Remix**: 전체 리믹스 등록 곡을 최신순/인기순으로 탐색할 수 있는 목록 페이지  
 <img width="1125" height="1194" alt="스크린샷 2026-01-23 오후 11 27 01" src="https://github.com/user-attachments/assets/154f3015-71ba-4f8a-87e0-b371d7b070f8" />
 
-3️⃣ **MyVibe**: 내가 등록한 리믹스의 득표 현황 및 좋아요한 핫트렌드곡, 리믹스곡 리스트 제공  
 3️⃣ **MyVibe**: 내가 등록한 리믹스의 득표 현황 및 좋아요한 핫트렌드곡, 리믹스곡 리스트 제공  
 <img width="1333" height="1197" alt="스크린샷 2026-01-24 오전 2 35 03" src="https://github.com/user-attachments/assets/80dd4b96-8d94-4732-b07c-5c54a5079592" />
 <img width="1344" height="1207" alt="스크린샷 2026-01-24 오전 2 34 53" src="https://github.com/user-attachments/assets/3e62e7ff-fd9c-41d6-81c8-6cdb7220a6a7" />
@@ -73,6 +43,11 @@
 
 5️⃣ **Ranking**: 축적된 투표 데이터를 기반으로 실시간 트렌드를 반영하여 산출된 **플랫폼 통합 인기 랭킹** 시스템
 <img width="1288" height="1204" alt="스크린샷 2026-01-23 오후 11 29 14" src="https://github.com/user-attachments/assets/faec3b58-fc61-4f59-b662-23080452d01f" />
+
+6️⃣ **Mix Match**: 1:1 매칭 인터페이스를 통한 몰입감 있는 투표 경험 제공  
+<img width="1370" height="1194" alt="스크린샷 2026-01-23 오후 11 25 33" src="https://github.com/user-attachments/assets/0a7c4960-b1ba-4b47-ab4a-f2ac8da75895" />
+
+
 
 ---
 
@@ -258,16 +233,18 @@ return Inertia::render('Posts/Index', [
 ## 데이터베이스 운영
 
 ### 1. 관계형 데이터 모델링 (MariaDB)
-* **테이블 정규화**: `Users`, `Remixes`, `MatchLogs` 테이블 간의 효율적인 관계 설정을 통해 데이터 무결성을 확보했습니다.
-* **득표수 집계 최적화**: `MatchLog` 테이블에 투표 데이터를 기록하고, 이를 기반으로 리믹스의 실시간 승률 및 순위를 산출하는 로직을 구축했습니다.
-* **상태 관리 설계**: `is_active` 컬럼을 활용하여 부적절한 게시물이나 비활성 사용자의 데이터를 실시간으로 필터링할 수 있도록 설계했습니다.
+* **비동기 분석 데이터 관리:**: AI 피드백 결과와 MIDI 메타데이터를 통합 관리하는 `Analyses` 테이블을 설계하여, 리믹스 업로드와 분석 결과 사이의 논리적 연결을 강화했습니다.
+* **테이블 정규화**: `Users`, `Remixes`, `MatchLogs`,`Analyses` 테이블 간의 효율적인 관계 설정을 통해 데이터 무결성을 확보했습니다.
+* **대규모 데이터 처리 최적화**: `MatchLog` 테이블을 통한 승률/순위 산출 로직을 고도화하고, `is_active` 컬럼 기반의 필터링을 통해 대규모 트래픽 시에도 데이터 응답 속도를 확보했습니다.
 
 
 ---
 
 ## 도커 운영
 
-* **컨테이너화**: PHP-FPM, Nginx, MariaDB를 개별 컨테이너로 분리하여 독립적이고 일관된 운영 환경을 구축했습니다.
-* **마운트**: 소스 코드와 DB 데이터를 볼륨으로 관리하여 컨테이너 재생성 시에도 데이터가 유지되도록 설계했습니다.
+* **컨테이너화**: PHP-FPM(App), Nginx(Web), MariaDB, Redis, Node.js(Crawler)를 개별 컨테이너로 분리하여 독립적이고 일관된 운영 환경을 구축했습니다.
+* **워크플로우 분리**: 분석 전 전용 일꾼인 queue-worker 컨테이너를 별도로 운용하여, 웹 요청 처리와 무거운 백그라운드 작업이 서로의 성능에 영향을 주지 않도록 설계했습니다.
+* **마운트**: 소스 코드와 DB 데이터(mariadb_data) 및 인메모리 데이터(redis_data)으로 관리하여 컨테이너 재생성 시에도 데이터가 유지되도록 설계했습니다.
+* **컨테이너 간 스토리지 공유 최적화**: Laravel 컨테이너가 생성한 MIDI 파일을 NGinx 컨테이너가 즉시 서빙할 수 있도록 물리적 스토리지 경로(Storage Path)를 다중 마운트하여, 심볼릭 링크 문제를 해결하고 정적 파일 접근성을 확보했습니다.
 
 
