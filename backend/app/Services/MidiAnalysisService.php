@@ -59,13 +59,27 @@ class MidiAnalysisService
                     . "4. 모든 답변은 한국어로, 전문가답지만 간결하게 작성하세요.";
 
         try {
-            $response = Http::timeout(30)->post('http://host.docker.internal:11434/api/generate', [
-                'model' => 'gemma2:2b', 
-                'prompt' => $prompt,
-                'stream' => false
-            ]);
+            // 로컬 ai모델(실서버 메모리 부족으로 X)
+            // $response = Http::timeout(30)->post('http://host.docker.internal:11434/api/generate', [
+            //     'model' => 'gemma2:2b', 
+            //     'prompt' => $prompt,
+            //     'stream' => false
+            // ]);
+            // $aiAnalysis = $response->json()['response'] ?? 'AI 분석 결과를 가져올 수 없습니다.';
+            // Groq API 호출 (OpenAI 호환 규격)
+            $response = Http::withToken(config('services.groq.key'))
+                ->timeout(30)
+                ->post('https://api.groq.com/openai/v1/chat/completions', [
+                    'model' => config('services.groq.model'), // llama-3.3-70b-versatile
+                    'messages' => [
+                        ['role' => 'system', 'content' => '너는 전문 음악 프로듀서이자 MIDI 분석 전문가야.'],
+                        ['role' => 'user', 'content' => $prompt]
+                    ],
+                    'temperature' => 0.7,
+                ]);
 
-            $aiAnalysis = $response->json()['response'] ?? 'AI 분석 결과를 가져올 수 없습니다.';
+            $responseData = $response->json();
+            $aiAnalysis = $responseData['choices'][0]['message']['content'] ?? 'AI 분석 결과를 가져올 수 없습니다.';
 
             return array_merge($data, [
                 'status' => 'success',

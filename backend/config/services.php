@@ -49,5 +49,10 @@ return [
         'client_id' => env('KAKAO_CLIENT_ID'),
         'client_secret' => env('KAKAO_CLIENT_SECRET'), 
         'redirect' => env('KAKAO_REDIRECT_URI'),
-    ]
+    ],
+
+    'groq' => [
+        'key' => env('GROQ_API_KEY'),
+        'model' => 'llama-3.3-70b-versatile', // 기본 모델 설정
+    ],
 ];
