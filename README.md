@@ -1,5 +1,6 @@
 # Trend Mixer
 #### 바로가기
+* [사이트 방문하기](https://trendvibe.kr)
 * [사이트 소개](#사이트-소개)
 * [Laravel 핵심 기술](#laravel-핵심기술)
 * [Vue.js 핵심기술](#vuejs-핵심기술)
